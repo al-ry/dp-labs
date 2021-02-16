@@ -11,10 +11,11 @@ namespace Valuator.Pages
     public class SummaryModel : PageModel
     {
         private readonly ILogger<SummaryModel> _logger;
-
-        public SummaryModel(ILogger<SummaryModel> logger)
+        private IStorage _storage;
+        public SummaryModel(ILogger<SummaryModel> logger, IStorage storage)
         {
             _logger = logger;
+            _storage = storage;
         }
 
         public double Rank { get; set; }
@@ -23,8 +24,8 @@ namespace Valuator.Pages
         public void OnGet(string id)
         {
             _logger.LogDebug(id);
-
-            //TODO: проинициализировать свойства Rank и Similarity сохранёнными в БД значениями
+            Rank = Math.Round(Convert.ToDouble(_storage.GetValue("RANK-" + id)), 2);
+            Similarity = Math.Round(Convert.ToDouble(_storage.GetValue("SIMILARITY-" + id)), 2);
         }
     }
 }

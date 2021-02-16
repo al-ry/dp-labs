@@ -11,33 +11,63 @@ namespace Valuator.Pages
     public class IndexModel : PageModel
     {
         private readonly ILogger<IndexModel> _logger;
-
-        public IndexModel(ILogger<IndexModel> logger)
+        private IStorage _storage;
+        public IndexModel(ILogger<IndexModel> logger, IStorage storage)
         {
+            _storage = storage;
             _logger = logger;
         }
 
         public void OnGet()
         {
-
         }
 
         public IActionResult OnPost(string text)
         {
-            _logger.LogDebug(text);
+            if (String.IsNullOrEmpty(text))
+            {
+                return Redirect($"summary");
+            }
 
             string id = Guid.NewGuid().ToString();
+            string similarityKey = "SIMILARITY-" + id;
+            var similarity = GetSimilarity(text);
+            _storage.StoreValue(similarityKey, similarity.ToString());
 
             string textKey = "TEXT-" + id;
-            //TODO: сохранить в БД text по ключу textKey
+            _storage.StoreValue(textKey, text);
 
             string rankKey = "RANK-" + id;
-            //TODO: посчитать rank и сохранить в БД по ключу rankKey
+            var  rank = GetRank(text);
+            _storage.StoreValue(rankKey, rank.ToString());
 
-            string similarityKey = "SIMILARITY-" + id;
-            //TODO: посчитать similarity и сохранить в БД по ключу similarityKey
+            return Redirect($"summary?id={id}");     
+        }
 
-            return Redirect($"summary?id={id}");
+        private int GetSimilarity(string text)
+        {
+            var values = _storage.GetAllValuesWithKeyPrefix("TEXT-");
+            foreach (var val in values)
+            {
+                if (val == text)
+                {
+                    return 1;
+                }
+            }
+            return 0;
+        }
+
+        private double GetRank(string text)
+        {
+            int nonalphaCounter = 0;
+            foreach (var ch in text)
+            {
+                if (!Char.IsLetter(ch))
+                {
+                    nonalphaCounter++;
+                }
+            }
+            return Convert.ToDouble(nonalphaCounter) / Convert.ToDouble(text.Length);
         }
     }
 }
