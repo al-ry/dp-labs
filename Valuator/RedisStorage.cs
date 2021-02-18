@@ -1,6 +1,7 @@
 using Microsoft.Extensions.Logging;
 using StackExchange.Redis;
 using System.Collections.Generic;
+
 namespace Valuator
 {
     public class RedisStorage : IStorage
@@ -25,14 +26,15 @@ namespace Valuator
             return db.StringGet(key);
         }
 
-        public List<string> GetAllValuesWithKeyPrefix(string prefix)
+        public HashSet<string> GetAllValuesWithKeyPrefix(string prefix)
         {
             var server = _connection.GetServer(_host, _port);
-            List<string> values = new List<string>();
-            foreach (var key in server.Keys(pattern: "*" + prefix + "*"))
+            HashSet<string> values = new HashSet<string>();
+            foreach (var key in server.Keys(pattern: prefix + "*"))
             {
                 values.Add(this.GetValue(key));
             }
+            _logger.LogWarning(values.Count.ToString());
             return values;
         }
     }

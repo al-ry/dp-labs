@@ -38,23 +38,23 @@ namespace Valuator.Pages
             _storage.StoreValue(textKey, text);
 
             string rankKey = "RANK-" + id;
-            var  rank = GetRank(text);
+            var rank = GetRank(text);
             _storage.StoreValue(rankKey, rank.ToString());
 
             return Redirect($"summary?id={id}");     
         }
 
-        private int GetSimilarity(string text)
+        private double GetSimilarity(string text)
         {
             var values = _storage.GetAllValuesWithKeyPrefix("TEXT-");
             foreach (var val in values)
             {
                 if (val == text)
                 {
-                    return 1;
+                    return 1d;
                 }
             }
-            return 0;
+            return 0d;
         }
 
         private double GetRank(string text)
