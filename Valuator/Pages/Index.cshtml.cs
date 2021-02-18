@@ -46,13 +46,9 @@ namespace Valuator.Pages
 
         private double GetSimilarity(string text)
         {
-            var values = _storage.GetAllValuesWithKeyPrefix("TEXT-");
-            foreach (var val in values)
+            if (_storage.FindText(text))
             {
-                if (val == text)
-                {
-                    return 1d;
-                }
+                return 1d;
             }
             return 0d;
         }
