@@ -15,22 +15,18 @@ namespace Valuator
         {
             _connection = ConnectionMultiplexer.Connect($"{_host}, allowAdmin=true");
             _logger = logger;
-            FillTextsSet();
-        }
-        private void FillTextsSet()
-        {
-            var server = _connection.GetServer(_host, _port);
-            var db = _connection.GetDatabase();
-            foreach (var key in server.Keys(pattern: "TEXT-*"))
-            {
-                db.SetAdd(_allTextsKey, this.GetValue(key));
-            }
         }
         public void StoreValue(string key, string value)
         {
             var db = _connection.GetDatabase();
+            if (key.StartsWith("TEXT-"))
+            {
+                Console.WriteLine("yes");
+                db.SetAdd(_allTextsKey, value);
+            }
             db.StringSet(key, value);
         }
+
         public string GetValue(string key)
         {    
             var db = _connection.GetDatabase();
