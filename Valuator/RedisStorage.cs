@@ -6,10 +6,12 @@ namespace Valuator
     public class RedisStorage : IStorage
     {
         private readonly ILogger<RedisStorage> _logger;
+        private const string _host = "localhost";
+        private const int _port = 6379;
         private IConnectionMultiplexer _connection;
         public RedisStorage (ILogger<RedisStorage> logger)
         {
-            _connection = ConnectionMultiplexer.Connect("localhost, allowAdmin=true");
+            _connection = ConnectionMultiplexer.Connect($"{_host}, allowAdmin=true");
             _logger = logger;
         }
         public void StoreValue(string key, string value)
@@ -25,7 +27,7 @@ namespace Valuator
 
         public List<string> GetAllValuesWithKeyPrefix(string prefix)
         {
-            var server = _connection.GetServer("localhost", 6379);
+            var server = _connection.GetServer(_host, _port);
             List<string> values = new List<string>();
             foreach (var key in server.Keys(pattern: "*" + prefix + "*"))
             {
