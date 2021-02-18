@@ -21,7 +21,6 @@ namespace Valuator
             var db = _connection.GetDatabase();
             if (key.StartsWith("TEXT-"))
             {
-                Console.WriteLine("yes");
                 db.SetAdd(_allTextsKey, value);
             }
             db.StringSet(key, value);
