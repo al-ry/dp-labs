@@ -34,7 +34,6 @@ namespace Valuator
             {
                 values.Add(this.GetValue(key));
             }
-            _logger.LogWarning(values.Count.ToString());
             return values;
         }
     }
