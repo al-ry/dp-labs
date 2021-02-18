@@ -30,14 +30,14 @@ namespace Valuator.Pages
             }
 
             string id = Guid.NewGuid().ToString();
-            string similarityKey = "SIMILARITY-" + id;
+            string similarityKey = Constants.SimilarityKeyPrefix + id;
             var similarity = GetSimilarity(text);
             _storage.StoreValue(similarityKey, similarity.ToString());
 
-            string textKey = "TEXT-" + id;
+            string textKey = Constants.TextKeyPrefix + id;
             _storage.StoreValue(textKey, text);
 
-            string rankKey = "RANK-" + id;
+            string rankKey = Constants.RankKeyPrefix + id;
             var rank = GetRank(text);
             _storage.StoreValue(rankKey, rank.ToString());
 

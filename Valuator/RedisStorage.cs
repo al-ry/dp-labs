@@ -2,6 +2,7 @@ using Microsoft.Extensions.Logging;
 using StackExchange.Redis;
 using System.Collections.Generic;
 using System;
+
 namespace Valuator
 {
     public class RedisStorage : IStorage
@@ -19,7 +20,7 @@ namespace Valuator
         public void StoreValue(string key, string value)
         {
             var db = _connection.GetDatabase();
-            if (key.StartsWith("TEXT-"))
+            if (key.StartsWith(Constants.TextKeyPrefix))
             {
                 db.SetAdd(_allTextsKey, value);
             }
