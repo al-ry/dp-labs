@@ -11,7 +11,7 @@ namespace Valuator.Pages
     public class IndexModel : PageModel
     {
         private readonly ILogger<IndexModel> _logger;
-        private IStorage _storage;
+        private readonly IStorage _storage;
         public IndexModel(ILogger<IndexModel> logger, IStorage storage)
         {
             _storage = storage;
@@ -36,6 +36,7 @@ namespace Valuator.Pages
 
             string textKey = Constants.TextKeyPrefix + id;
             _storage.StoreValue(textKey, text);
+            _storage.StoreTextToSet(text);
 
             string rankKey = Constants.RankKeyPrefix + id;
             var rank = GetRank(text);
