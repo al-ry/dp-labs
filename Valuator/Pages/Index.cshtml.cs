@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Text;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Logging;
@@ -12,10 +13,12 @@ namespace Valuator.Pages
     {
         private readonly ILogger<IndexModel> _logger;
         private readonly IStorage _storage;
-        public IndexModel(ILogger<IndexModel> logger, IStorage storage)
+        private readonly IMessageBroker _messageBroker;
+        public IndexModel(ILogger<IndexModel> logger, IStorage storage, IMessageBroker broker)
         {
             _storage = storage;
             _logger = logger;
+            _messageBroker = broker;
         }
 
         public void OnGet()
@@ -39,8 +42,8 @@ namespace Valuator.Pages
             _storage.StoreTextToSet(text);
 
             string rankKey = Constants.RankKeyPrefix + id;
-            var rank = GetRank(text);
-            _storage.StoreValue(rankKey, rank.ToString());
+            byte[] data = Encoding.UTF8.GetBytes(id);
+            _messageBroker.Publish(Constants.RankCalculatorEventName, data);
 
             return Redirect($"summary?id={id}");     
         }
@@ -52,19 +55,6 @@ namespace Valuator.Pages
                 return 1d;
             }
             return 0d;
-        }
-
-        private double GetRank(string text)
-        {
-            int nonalphaCounter = 0;
-            foreach (var ch in text)
-            {
-                if (!Char.IsLetter(ch))
-                {
-                    nonalphaCounter++;
-                }
-            }
-            return Convert.ToDouble(nonalphaCounter) / Convert.ToDouble(text.Length);
         }
     }
 }

@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 
-namespace Valuator {
+namespace Valuator
+{
     public interface IStorage
     {
         void StoreValue(string key, string value);
