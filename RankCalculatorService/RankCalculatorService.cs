@@ -8,12 +8,12 @@ namespace RankCalculatorService
 {
     public class RankCalculatorService
     {
-        private readonly NatsSubscriber _subscr;
+        private readonly ISubscriber<MsgHandlerEventArgs> _subscr;
         private const string RankCalculatorQueue = "rank_calculator";
 
         private readonly IStorage _storage;
 
-        public RankCalculatorService(IStorage storage, NatsSubscriber sub)
+        public RankCalculatorService(IStorage storage, ISubscriber<MsgHandlerEventArgs> sub)
         {
             _storage = storage;
 
