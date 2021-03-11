@@ -31,10 +31,11 @@ namespace Valuator
         {
             _subscr.Unsubscribe();
         }
-        // ~NatsSubscriber()
-        // {
-        //     _connection.Drain();
-        //     _connection.Close();
-        // }
+
+        ~NatsSubscriber()
+        {
+            _connection.Drain();
+            _connection.Close();
+        }
     }
 }
