@@ -36,6 +36,8 @@ namespace Valuator.Pages
             string similarityKey = Constants.SimilarityKeyPrefix + id;
             var similarity = GetSimilarity(text);
             _storage.StoreValue(similarityKey, similarity.ToString());
+            byte[] iddata = Encoding.UTF8.GetBytes(id);
+            //_messageBroker.Publish(Constants.SimilarityCalculatedEventName, iddata);
 
             string textKey = Constants.TextKeyPrefix + id;
             _storage.StoreValue(textKey, text);

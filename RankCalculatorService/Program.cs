@@ -10,7 +10,8 @@ namespace RankCalculatorService
         {
             RedisStorage storage = new RedisStorage();
             NatsSubscriber natsSubscriber = new NatsSubscriber();
-            RankCalculatorService rankCalculatorService = new RankCalculatorService(storage, natsSubscriber);
+            NatsPublisher natsPublisher = new NatsPublisher();
+            RankCalculatorService rankCalculatorService = new RankCalculatorService(storage, natsSubscriber, natsPublisher);
             rankCalculatorService.Start();
         }
     }

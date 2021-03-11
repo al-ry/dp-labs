@@ -8,25 +8,27 @@ namespace RankCalculatorService
 {
     public class RankCalculatorService
     {
-        private readonly NatsSubscriber _subscr;
+        private readonly ISubscriber<MsgHandlerEventArgs> _subscr;
         private const string RankCalculatorQueue = "rank_calculator";
-
         private readonly IStorage _storage;
+        private readonly IPublisher _pub;
 
-        public RankCalculatorService(IStorage storage, NatsSubscriber sub)
+        public RankCalculatorService(IStorage storage, ISubscriber<MsgHandlerEventArgs> sub, IPublisher pub)
         {
             _storage = storage;
 
             _subscr = sub;
+            _pub = pub;
             _subscr.SubscribeAsyncWithQueue(Constants.RankCalculatorEventName, RankCalculatorQueue, (sender, args) =>
             {
                 string id = Encoding.UTF8.GetString(args.Message.Data);
                 string text = _storage.GetValue(Constants.TextKeyPrefix + id);
                 var rank = GetRank(text);
                 _storage.StoreValue(Constants.RankKeyPrefix + id, rank.ToString());
+                _pub.Publish(Constants.RankCalculatedEventName, args.Message.Data);
+                
             });
         }
-
         public void Start()
         {
             Console.WriteLine("RankCalculator service started");

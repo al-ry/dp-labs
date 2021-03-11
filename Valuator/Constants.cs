@@ -7,5 +7,8 @@ namespace Valuator
         public const string SimilarityKeyPrefix = "SIMILARITY-";
 
         public const string RankCalculatorEventName = "valuator.processing.rank";
+
+        public const string RankCalculatedEventName = "RankCalculated";
+        public const string SimilarityCalculatedEventName = "SimilarityCalculated";
     }
 }
