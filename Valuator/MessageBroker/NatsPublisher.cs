@@ -8,7 +8,7 @@ using System.IO;
 
 namespace Valuator
 {
-    public class NatsMessageBroker: IMessageBroker
+    public class NatsPublisher: IPublisher
     {
         public void Publish(string subject, byte[] data)
         {

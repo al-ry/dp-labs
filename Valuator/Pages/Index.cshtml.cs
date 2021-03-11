@@ -13,12 +13,12 @@ namespace Valuator.Pages
     {
         private readonly ILogger<IndexModel> _logger;
         private readonly IStorage _storage;
-        private readonly IMessageBroker _messageBroker;
-        public IndexModel(ILogger<IndexModel> logger, IStorage storage, IMessageBroker broker)
+        private readonly IPublisher _publisher;
+        public IndexModel(ILogger<IndexModel> logger, IStorage storage, IPublisher publisher)
         {
             _storage = storage;
             _logger = logger;
-            _messageBroker = broker;
+            _publisher = publisher;
         }
 
         public void OnGet()
@@ -43,7 +43,7 @@ namespace Valuator.Pages
 
             string rankKey = Constants.RankKeyPrefix + id;
             byte[] data = Encoding.UTF8.GetBytes(id);
-            _messageBroker.Publish(Constants.RankCalculatorEventName, data);
+            _publisher.Publish(Constants.RankCalculatorEventName, data);
 
             return Redirect($"summary?id={id}");     
         }

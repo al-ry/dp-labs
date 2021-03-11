@@ -1,6 +1,6 @@
 namespace Valuator
 {
-    public interface IMessageBroker
+    public interface IPublisher
     {
         void Publish(string subject, byte[] data);
     }

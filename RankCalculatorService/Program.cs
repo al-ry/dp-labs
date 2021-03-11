@@ -9,7 +9,8 @@ namespace RankCalculatorService
         static void Main(string[] args)
         {
             RedisStorage storage = new RedisStorage();
-            RankCalculatorService rankCalculatorService = new RankCalculatorService(storage);
+            NatsSubscriber natsSubscriber = new NatsSubscriber();
+            RankCalculatorService rankCalculatorService = new RankCalculatorService(storage, natsSubscriber);
             rankCalculatorService.Start();
         }
     }

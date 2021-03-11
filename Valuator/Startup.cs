@@ -23,7 +23,7 @@ namespace Valuator
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddScoped<IMessageBroker, NatsMessageBroker>();
+            services.AddScoped<IPublisher, NatsPublisher>();
             services.AddScoped<IStorage, RedisStorage>();
             services.AddRazorPages();
         }

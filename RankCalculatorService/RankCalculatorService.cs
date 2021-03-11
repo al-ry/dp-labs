@@ -8,20 +8,17 @@ namespace RankCalculatorService
 {
     public class RankCalculatorService
     {
-        private readonly IConnection _connection;
-        private readonly IAsyncSubscription _subscr;
+        private readonly NatsSubscriber _subscr;
         private const string RankCalculatorQueue = "rank_calculator";
 
         private readonly IStorage _storage;
 
-        public RankCalculatorService(IStorage storage)
+        public RankCalculatorService(IStorage storage, NatsSubscriber sub)
         {
             _storage = storage;
 
-            ConnectionFactory cf = new ConnectionFactory();
-            _connection = cf.CreateConnection();
-
-            _subscr = _connection.SubscribeAsync(Constants.RankCalculatorEventName, RankCalculatorQueue, (sender, args) =>
+            _subscr = sub;
+            _subscr.SubscribeAsyncWithQueue(Constants.RankCalculatorEventName, RankCalculatorQueue, (sender, args) =>
             {
                 string id = Encoding.UTF8.GetString(args.Message.Data);
                 string text = _storage.GetValue(Constants.TextKeyPrefix + id);
@@ -40,9 +37,6 @@ namespace RankCalculatorService
             Console.ReadLine();
 
             _subscr.Unsubscribe();
-
-            _connection.Drain();
-            _connection.Close();
         }
 
         private double GetRank(string text)
