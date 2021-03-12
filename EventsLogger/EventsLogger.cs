@@ -27,7 +27,6 @@ namespace EventsLogger
             Console.WriteLine($"Context id: {info.contextId}");
             Console.WriteLine($"Similarity value: {info.similarity}");
             Console.WriteLine();
-            //args.Message.ArrivalSubcription.Unsubscribe();
         };
         private EventHandler<MsgHandlerEventArgs> _rankCalculatedHandler = (sender, args) =>
         {
@@ -37,7 +36,6 @@ namespace EventsLogger
             Console.WriteLine($"Context id: {info.contextId}");
             Console.WriteLine($"Rank value: {info.rank}");
             Console.WriteLine();
-            //args.Message.ArrivalSubcription.Unsubscribe();
         };
 
         private static SimilarityInfo DeserializeSimilarityInfo(byte[] jsonUtf8Bytes)
