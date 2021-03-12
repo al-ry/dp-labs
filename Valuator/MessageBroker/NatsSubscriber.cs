@@ -12,7 +12,6 @@ namespace Valuator
 
         private readonly IConnection _connection;
         private IAsyncSubscription _subscr;
-        public event EventHandler ThresholdReached;
         public NatsSubscriber()
         {  
             ConnectionFactory cf = new ConnectionFactory();
