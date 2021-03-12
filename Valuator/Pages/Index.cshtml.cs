@@ -6,6 +6,8 @@ using System.Text;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Logging;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace Valuator.Pages
 {
@@ -33,23 +35,45 @@ namespace Valuator.Pages
             }
 
             string id = Guid.NewGuid().ToString();
-            string similarityKey = Constants.SimilarityKeyPrefix + id;
-            var similarity = GetSimilarity(text);
-            _storage.StoreValue(similarityKey, similarity.ToString());
-            byte[] iddata = Encoding.UTF8.GetBytes(id);
-            //_messageBroker.Publish(Constants.SimilarityCalculatedEventName, iddata);
+            
+            ProcessSimilarity(id, text);
 
-            string textKey = Constants.TextKeyPrefix + id;
-            _storage.StoreValue(textKey, text);
-            _storage.StoreTextToSet(text);
+            StoreText(id, text);
 
-            string rankKey = Constants.RankKeyPrefix + id;
-            byte[] data = Encoding.UTF8.GetBytes(id);
-            _publisher.Publish(Constants.RankCalculatorEventName, data);
+            DelegateRankProcessing(id);
 
             return Redirect($"summary?id={id}");     
         }
+        private void StoreText(string id, string text)
+        {
+            string textKey = Constants.TextKeyPrefix + id;
+            _storage.StoreValue(textKey, text);
+            _storage.StoreTextToSet(text);
+        }
+        private void DelegateRankProcessing(string id)
+        {
+            string rankKey = Constants.RankKeyPrefix + id;
+            byte[] data = Encoding.UTF8.GetBytes(id);
+            _publisher.Publish(Constants.RankCalculatorEventName, data);
+        }
+        private void ProcessSimilarity(string id, string text)
+        {
+            string similarityKey = Constants.SimilarityKeyPrefix + id;
+            var similarity = GetSimilarity(text);
+            _storage.StoreValue(similarityKey, similarity.ToString());
+            var jsonUtf8Bytes = SerializeSimilarityInfo(similarityKey, similarity.ToString());
+            _publisher.Publish(Constants.SimilarityCalculatedEventName, jsonUtf8Bytes);
+        }
 
+        private static byte[] SerializeSimilarityInfo(string id, string simValue)
+        {
+            SimilarityInfo info = new SimilarityInfo()
+            {
+                similarity = simValue,
+                contextId = id
+            };
+            return JsonSerializer.SerializeToUtf8Bytes(info);
+        }
         private double GetSimilarity(string text)
         {
             if (_storage.FindText(text))

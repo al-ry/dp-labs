@@ -3,6 +3,8 @@ using NATS.Client;
 using System.Text;
 using Valuator;
 using System.Threading.Tasks;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace RankCalculatorService
 {
@@ -23,11 +25,23 @@ namespace RankCalculatorService
             {
                 string id = Encoding.UTF8.GetString(args.Message.Data);
                 string text = _storage.GetValue(Constants.TextKeyPrefix + id);
-                var rank = GetRank(text);
-                _storage.StoreValue(Constants.RankKeyPrefix + id, rank.ToString());
-                _pub.Publish(Constants.RankCalculatedEventName, args.Message.Data);
+                string idWithRankPrefix = Constants.RankKeyPrefix + id;
                 
+                var rank = GetRank(text);
+                _storage.StoreValue(idWithRankPrefix, rank.ToString());
+
+                var jsonUtf8Bytes = SerializeRankInfo(idWithRankPrefix, rank.ToString());
+                _pub.Publish(Constants.RankCalculatedEventName, jsonUtf8Bytes);         
             });
+        }
+        private static byte[] SerializeRankInfo(string id, string rankValue)
+        {
+            RankInfo info = new RankInfo()
+            {
+                rank = rankValue,
+                contextId = id
+            };
+            return JsonSerializer.SerializeToUtf8Bytes(info);
         }
         public void Start()
         {

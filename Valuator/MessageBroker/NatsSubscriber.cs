@@ -12,7 +12,6 @@ namespace Valuator
 
         private readonly IConnection _connection;
         private IAsyncSubscription _subscr;
-        public event EventHandler ThresholdReached;
         public NatsSubscriber()
         {  
             ConnectionFactory cf = new ConnectionFactory();
@@ -21,6 +20,10 @@ namespace Valuator
         public void SubscribeAsyncWithQueue(string subject, string queue, EventHandler<MsgHandlerEventArgs> handler)
         {
             _subscr = _connection.SubscribeAsync(subject, queue, handler);
+        }
+        public void SubscribeAsync(string subject, EventHandler<MsgHandlerEventArgs> handler)
+        {
+            _subscr = _connection.SubscribeAsync(subject, handler);
         }
         public void Start()
         {
@@ -31,10 +34,10 @@ namespace Valuator
         {
             _subscr.Unsubscribe();
         }
-        // ~NatsSubscriber()
-        // {
-        //     _connection.Drain();
-        //     _connection.Close();
-        // }
+        ~NatsSubscriber()
+        {
+            _connection.Drain();
+            _connection.Close();
+        }
     }
 }
