@@ -16,7 +16,7 @@ namespace RankCalculatorService
         public RankCalculatorService(IStorage storage, ISubscriber<MsgHandlerEventArgs> sub)
         {
             _storage = storage;
-
+            
             _subscr = sub;
             _subscr.SubscribeAsyncWithQueue(Constants.RankCalculatorEventName, RankCalculatorQueue, (sender, args) =>
             {
@@ -24,6 +24,7 @@ namespace RankCalculatorService
                 string text = _storage.GetValue(Constants.TextKeyPrefix + id);
                 var rank = GetRank(text);
                 _storage.StoreValue(Constants.RankKeyPrefix + id, rank.ToString());
+
             });
         }
 
@@ -49,7 +50,13 @@ namespace RankCalculatorService
                     nonalphaCounter++;
                 }
             }
-            return Convert.ToDouble(nonalphaCounter) / Convert.ToDouble(text.Length);
+
+            var rank = Convert.ToDouble(nonalphaCounter) / Convert.ToDouble(text.Length);
+
+            string logText = $"Text: {text.Substring(0, Math.Min(10, text.Length))} Length: {text.Length} Non alpha count: {nonalphaCounter} Rank {rank}";
+            Console.WriteLine(logText);
+
+            return rank;
         }
     }
 }
