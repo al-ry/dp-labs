@@ -34,6 +34,7 @@ namespace Valuator
         {
             _subscr.Unsubscribe();
         }
+        
         ~NatsSubscriber()
         {
             _connection.Drain();

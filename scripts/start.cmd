@@ -7,8 +7,8 @@ set EVENTS_LOGGER="../EventsLogger/"
 
 pushd %APP_PATH%
 
-start dotnet run --urls "http://localhost:5001"
-start dotnet run --urls "http://localhost:5002"
+start dotnet run --no-build --urls "http://localhost:5001"
+start dotnet run --no-build --urls "http://localhost:5002"
 
 popd
 
