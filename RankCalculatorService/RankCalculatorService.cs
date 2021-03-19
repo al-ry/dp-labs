@@ -65,7 +65,12 @@ namespace RankCalculatorService
                     nonalphaCounter++;
                 }
             }
-            return Convert.ToDouble(nonalphaCounter) / Convert.ToDouble(text.Length);
+            var rank = Convert.ToDouble(nonalphaCounter) / Convert.ToDouble(text.Length);
+
+            string logText = $"Text: {text.Substring(0, Math.Min(10, text.Length))} Length: {text.Length} Non alpha count: {nonalphaCounter} Rank {rank}";
+            Console.WriteLine(logText);
+
+            return rank;
         }
     }
 }
