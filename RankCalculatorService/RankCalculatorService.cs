@@ -24,11 +24,13 @@ namespace RankCalculatorService
             _subscr.SubscribeAsyncWithQueue(Constants.RankCalculatorEventName, RankCalculatorQueue, (sender, args) =>
             {
                 string id = Encoding.UTF8.GetString(args.Message.Data);
-                string text = _storage.GetValue(Constants.TextKeyPrefix + id);
+                Console.WriteLine("LOOKUP: {0}, {1}", id, _storage.GetShardId(id));
+
+                string text = _storage.GetValue(id, Constants.TextKeyPrefix + id);
                 string idWithRankPrefix = Constants.RankKeyPrefix + id;
                 
                 var rank = GetRank(text);
-                _storage.StoreValue(idWithRankPrefix, rank.ToString());
+                _storage.StoreValue(id, idWithRankPrefix, rank.ToString());
 
                 var jsonUtf8Bytes = SerializeRankInfo(idWithRankPrefix, rank.ToString());
                 _pub.Publish(Constants.RankCalculatedEventName, jsonUtf8Bytes);         
@@ -38,8 +40,8 @@ namespace RankCalculatorService
         {
             RankInfo info = new RankInfo()
             {
-                rank = rankValue,
-                contextId = id
+                Rank = rankValue,
+                ContextId = id
             };
             return JsonSerializer.SerializeToUtf8Bytes(info);
         }

@@ -2,7 +2,7 @@ namespace Valuator
 {
     public class SimilarityInfo
     {
-        public string similarity {get; set;}
-        public string contextId {get; set;}
+        public string Similarity {get; set;}
+        public string ContextId {get; set;}
     }
 }

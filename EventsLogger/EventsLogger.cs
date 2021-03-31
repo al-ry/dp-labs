@@ -24,8 +24,8 @@ namespace EventsLogger
             Console.WriteLine($"Event: {args.Message.Subject}");
             SimilarityInfo info = DeserializeSimilarityInfo(args.Message.Data);
 
-            Console.WriteLine($"Context id: {info.contextId}");
-            Console.WriteLine($"Similarity value: {info.similarity}");
+            Console.WriteLine($"Context id: {info.ContextId}");
+            Console.WriteLine($"Similarity value: {info.Similarity}");
             Console.WriteLine();
         };
         private EventHandler<MsgHandlerEventArgs> _rankCalculatedHandler = (sender, args) =>
@@ -33,8 +33,8 @@ namespace EventsLogger
             Console.WriteLine($"Event: {args.Message.Subject}");
             RankInfo info = DeserializeRankInfo(args.Message.Data);
 
-            Console.WriteLine($"Context id: {info.contextId}");
-            Console.WriteLine($"Rank value: {info.rank}");
+            Console.WriteLine($"Context id: {info.ContextId}");
+            Console.WriteLine($"Rank value: {info.Rank}");
             Console.WriteLine();
         };
 

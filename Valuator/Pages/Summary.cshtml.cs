@@ -12,7 +12,7 @@ namespace Valuator.Pages
     public class SummaryModel : PageModel
     {
         private readonly ILogger<SummaryModel> _logger;
-        private IStorage _storage;
+        private readonly IStorage _storage;
         private const int RetryCount = 1000;
         private readonly TimeSpan Delay = TimeSpan.FromSeconds(0.01);
         public SummaryModel(ILogger<SummaryModel> logger, IStorage storage)
@@ -28,6 +28,7 @@ namespace Valuator.Pages
         {
             _logger.LogDebug(id);
 
+            Console.WriteLine("LOOKUP: {0}, {1}", id, _storage.GetShardId(id));
             var rank = GetRankValue(id);
             if (String.IsNullOrEmpty(rank))
             {
@@ -35,9 +36,9 @@ namespace Valuator.Pages
             }
             else
             {
-                Rank = Math.Round(Convert.ToDouble(_storage.GetValue(Constants.RankKeyPrefix + id)), 2);
+                Rank = Math.Round(Convert.ToDouble(_storage.GetValue(id, Constants.RankKeyPrefix + id)), 2);
             }
-            Similarity = Math.Round(Convert.ToDouble(_storage.GetValue(Constants.SimilarityKeyPrefix + id)), 2);
+            Similarity = Math.Round(Convert.ToDouble(_storage.GetValue(id, Constants.SimilarityKeyPrefix + id)), 2);
         }
 
         private string GetRankValue(string id)
@@ -46,7 +47,7 @@ namespace Valuator.Pages
             string rank;
             while(currentRetry < RetryCount)
             {
-                rank = _storage.GetValue(Constants.RankKeyPrefix + id);
+                rank = _storage.GetValue(id, Constants.RankKeyPrefix + id);
                 if (!String.IsNullOrEmpty(rank))
                 { 
                     return rank;

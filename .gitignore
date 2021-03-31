@@ -442,6 +442,13 @@ $RECYCLE.BIN/
 !.vscode/extensions.json
 
 
+
+##
+## Redis
+##
+
+/redis
+
 ##
 ## Nginx
 ##

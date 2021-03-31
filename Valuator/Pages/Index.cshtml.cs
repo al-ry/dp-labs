@@ -27,7 +27,7 @@ namespace Valuator.Pages
         {
         }
 
-        public IActionResult OnPost(string text)
+        public IActionResult OnPost(string text, string countrySegment)
         {
             if (String.IsNullOrEmpty(text))
             {
@@ -35,7 +35,9 @@ namespace Valuator.Pages
             }
 
             string id = Guid.NewGuid().ToString();
-            
+
+            StoreNewShardKey(countrySegment, id);
+
             ProcessSimilarity(id, text);
 
             StoreText(id, text);
@@ -44,11 +46,17 @@ namespace Valuator.Pages
 
             return Redirect($"summary?id={id}");     
         }
+
+        private void StoreNewShardKey(string countrySegment, string textId)
+        {
+            _logger.LogDebug("LOOKUP: {0}, {1}", textId, countrySegment);
+            _storage.StoreNewShardKey(textId, countrySegment);
+        }
         private void StoreText(string id, string text)
         {
             string textKey = Constants.TextKeyPrefix + id;
-            _storage.StoreValue(textKey, text);
-            _storage.StoreTextToSet(text);
+            _storage.StoreValue(id, textKey, text);
+            _storage.StoreTextToSet(id, text);
         }
         private void DelegateRankProcessing(string id)
         {
@@ -60,7 +68,7 @@ namespace Valuator.Pages
         {
             string similarityKey = Constants.SimilarityKeyPrefix + id;
             var similarity = GetSimilarity(text);
-            _storage.StoreValue(similarityKey, similarity.ToString());
+            _storage.StoreValue(id, similarityKey, similarity.ToString());
             var jsonUtf8Bytes = SerializeSimilarityInfo(similarityKey, similarity.ToString());
             _publisher.Publish(Constants.SimilarityCalculatedEventName, jsonUtf8Bytes);
         }
@@ -69,8 +77,8 @@ namespace Valuator.Pages
         {
             SimilarityInfo info = new SimilarityInfo()
             {
-                similarity = simValue,
-                contextId = id
+                Similarity = simValue,
+                ContextId = id
             };
             return JsonSerializer.SerializeToUtf8Bytes(info);
         }
