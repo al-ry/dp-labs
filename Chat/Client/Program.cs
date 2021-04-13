@@ -2,21 +2,41 @@
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
+using System.Collections.Generic;
+using System.Text.Json;
 
 namespace Client
 {
+    class Arguments
+    {
+        public Arguments(string host, int port, string message)
+        {
+            Host = host;
+            Port = port;
+            Message = message;
+        }
+        public string Host { get; }
+        public int Port { get; }
+        public string Message { get; }
+    }
     class Program
     {
-        public static void StartClient()
+        public static void StartClient(string host, int port, string message)
         {
             try
             {
-                // Разрешение сетевых имён
-                IPAddress ipAddress = IPAddress.Loopback;
-                //IPHostEntry ipHostInfo = Dns.GetHostEntry(Dns.GetHostName());
-                //IPAddress ipAddress = ipHostInfo.AddressList[0];
+                IPAddress ipAddress;
+                if (host != "localhost")
+                {
+                    ipAddress = IPAddress.Parse(host);
+                }
+                else
+                {
+                    ipAddress = IPAddress.Loopback;
+                }
+                
 
-                IPEndPoint remoteEP = new IPEndPoint(ipAddress, 11000);
+                IPEndPoint remoteEP = new IPEndPoint(ipAddress, port);
 
                 // CREATE
                 Socket sender = new Socket(
@@ -29,21 +49,22 @@ namespace Client
                     // CONNECT
                     sender.Connect(remoteEP);
 
-                    Console.WriteLine("Удалённый адрес подключения сокета: {0}",
-                        sender.RemoteEndPoint.ToString());
-
                     // Подготовка данных к отправке
-                    byte[] msg = Encoding.UTF8.GetBytes("Hello, world!<EOF>");
+                    byte[] msgBytes = Encoding.UTF8.GetBytes(message);
 
                     // SEND
-                    int bytesSent = sender.Send(msg);
+                    int bytesSent = sender.Send(msgBytes);
 
                     // RECEIVE
                     byte[] buf = new byte[1024];
                     int bytesRec = sender.Receive(buf);
 
-                    Console.WriteLine("Ответ: {0}",
-                        Encoding.UTF8.GetString(buf, 0, bytesRec));
+                    var history = JsonSerializer.Deserialize<List<string>>(Encoding.UTF8.GetString(buf, 0, bytesRec));
+                    
+                    foreach (var msg in history)
+                    {
+                        Console.WriteLine(msg);
+                    }
 
                     // RELEASE
                     sender.Shutdown(SocketShutdown.Both);
@@ -72,7 +93,20 @@ namespace Client
 
         static void Main(string[] args)
         {
-            StartClient();
+            var arguments = ParseArguments(args);
+            StartClient(arguments.Host, arguments.Port, arguments.Message);
+        }
+
+        static Arguments ParseArguments(string[] args)
+        {
+            if (args.Length != 3)
+            {
+                throw new ArgumentException("Invalid arguments count");
+            }
+            string host = args[0];
+            var port = Int32.Parse(args[1]);
+            string message = args[2];
+            return new Arguments(host, port, message);
         }
     }
 }
