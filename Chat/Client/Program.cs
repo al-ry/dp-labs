@@ -4,6 +4,7 @@ using System.Net.Sockets;
 using System.Text;
 using System.Collections.Generic;
 using System.Text.Json;
+using System.Linq;
 
 namespace Client
 {
@@ -56,15 +57,31 @@ namespace Client
                     int bytesSent = sender.Send(msgBytes);
 
                     // RECEIVE
+                    string history = null;
+                    List<string> serializedHistory = null;
                     byte[] buf = new byte[1024];
-                    int bytesRec = sender.Receive(buf);
 
-                    var history = JsonSerializer.Deserialize<List<string>>(Encoding.UTF8.GetString(buf, 0, bytesRec));
-                    
-                    foreach (var msg in history)
+                    while (true)
+                    {
+                        // RECEIVE
+                        int bytesRec = sender.Receive(buf);
+                        history += Encoding.UTF8.GetString(buf, 0, bytesRec);
+                        try
+                        {
+                            serializedHistory = JsonSerializer.Deserialize<List<string>>(history);
+                            break;
+                        }
+                        catch (Exception)
+                        {
+                            continue;
+                        }
+
+                    }
+                    foreach (var msg in serializedHistory)
                     {
                         Console.WriteLine(msg);
                     }
+
 
                     // RELEASE
                     sender.Shutdown(SocketShutdown.Both);

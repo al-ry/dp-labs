@@ -42,11 +42,19 @@ namespace Server
 
                     byte[] buf = new byte[1024];
                     string data = null;
+                    
+                    while (true)
+                    {
+                        // RECEIVE
+                        int bytesRec = handler.Receive(buf);
 
+                        data += Encoding.UTF8.GetString(buf, 0, bytesRec);
+                        if (data.IndexOf("<EOF>") > -1)
+                        {
+                            break;
+                        }
 
-                    int bytesRec = handler.Receive(buf);
-
-                    data += Encoding.UTF8.GetString(buf, 0, bytesRec);
+                    }
                     Console.WriteLine("Message received: {0}", data);
 
                     _history.Add(data);
