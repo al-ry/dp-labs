@@ -55,9 +55,11 @@ namespace Server
                         }
 
                     }
-                    Console.WriteLine("Message received: {0}", data);
+                    var EOFIndex = data.IndexOf("<EOF>");
+                    var result = data.Remove(EOFIndex, 5);
+                    Console.WriteLine("Message received: {0}", result);
 
-                    _history.Add(data);
+                    _history.Add(result);
 
 
                     // SEND
